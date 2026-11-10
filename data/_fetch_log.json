@@ -1,0 +1,59 @@
+{
+ "checked": "2026-11-10 14:49",
+ "tables": {
+  "permit": {
+   "tbl": "DT_MLTM_1952",
+   "rows": 10359,
+   "first": "200701",
+   "latest": "202609",
+   "전국_total": 25938,
+   "전국_small": 978,
+   "smallFrom": "200701"
+  },
+  "sale": {
+   "tbl": "DT_MLTM_5557",
+   "rows": 3297,
+   "first": "201301",
+   "latest": "202609",
+   "전국_total": 19751,
+   "전국_small": null,
+   "smallFrom": null
+  },
+  "complete": {
+   "tbl": "DT_MLTM_5374",
+   "rows": 8308,
+   "first": "201007",
+   "latest": "202609",
+   "전국_total": 18449,
+   "전국_small": 1373,
+   "smallFrom": "201007"
+  },
+  "start": {
+   "tbl": "DT_MLTM_5388",
+   "rows": 8183,
+   "first": "201101",
+   "latest": "202609",
+   "전국_total": 16046,
+   "전국_small": 2653,
+   "smallFrom": "201101"
+  },
+  "unsold": {
+   "tbl": "DT_MLTM_2080",
+   "rows": 33994,
+   "first": "200701",
+   "latest": "202609",
+   "전국_total": 65941,
+   "전국_small": 1645,
+   "smallFrom": "202111"
+  },
+  "unsold_after": {
+   "tbl": "DT_MLTM_5328",
+   "rows": 26630,
+   "first": "200701",
+   "latest": "202609",
+   "전국_total": 27549,
+   "전국_small": 1624,
+   "smallFrom": "202111"
+  }
+ }
+}

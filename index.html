@@ -1,0 +1,417 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>유효 주택공급 지표</title>
+<link rel="preconnect" href="https://cdn.jsdelivr.net">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<style>
+:root{
+  --bg:#f5f6f4; --card:#fff; --ink:#1d2421; --ink2:#5d6762; --ink3:#8b948f; --line:#e6e9e7; --line2:#f0f2f1;
+  --brand:#16785a; --brand-d:#0f5e46; --brand-soft:#e8f3ee; --brand-bar:#9ccbb8;
+  --up:#c0392b; --down:#2f6db3; --warn-bg:#f1f8f4; --warn-line:#cfe5da;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:Pretendard,"Malgun Gothic",system-ui,sans-serif;font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1180px;margin:0 auto;padding:20px 16px 60px}
+.tabs{display:inline-flex;gap:4px;background:#e9ece9;padding:4px;border-radius:12px;flex-wrap:wrap}
+.tabs button{border:0;background:transparent;padding:9px 22px;border-radius:9px;font:inherit;font-weight:600;color:var(--ink2);cursor:pointer}
+.tabs button.on{background:#fff;color:var(--brand);box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.crumb{margin-top:22px;font-size:12px;color:var(--ink3)}
+.crumb b{color:var(--brand);font-weight:600}
+.head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap}
+h1{font-size:28px;margin:6px 0 4px;letter-spacing:-.5px}
+.sub{color:var(--ink2);margin:0}
+.btn{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--line);background:#fff;padding:10px 16px;border-radius:9px;font:inherit;font-weight:600;color:var(--ink);cursor:pointer;white-space:nowrap}
+.btn.pri{background:var(--brand);border-color:var(--brand);color:#fff}
+.btn.pri:hover{background:var(--brand-d)}
+.status{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;font-size:12px;color:var(--ink3);margin:18px 0 10px}
+.status .dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--brand);margin-right:6px;vertical-align:1px}
+.status b{color:var(--ink)}
+.note{background:var(--warn-bg);border:1px solid var(--warn-line);border-radius:10px;padding:11px 16px;color:var(--ink2);font-size:13px;margin-bottom:8px}
+.filters{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px;display:flex;gap:14px;align-items:flex-end;flex-wrap:wrap;margin:14px 0}
+.filters .lab{font-weight:700;font-size:13px;align-self:center;margin-right:6px}
+.fld{display:flex;flex-direction:column;gap:5px;flex:1;min-width:150px}
+.fld span{font-size:11px;color:var(--ink3)}
+select{font:inherit;padding:10px 12px;border:1px solid var(--line);border-radius:9px;background:#fff;color:var(--ink);width:100%}
+select:focus{outline:2px solid var(--brand);border-color:var(--brand)}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px 20px;min-height:128px}
+.kpi .t{font-size:12.5px;color:var(--ink2)}
+.kpi .v{font-size:32px;font-weight:800;letter-spacing:-1px;margin:8px 0 4px;font-variant-numeric:tabular-nums}
+.kpi .v small{font-size:13px;font-weight:500;color:var(--ink3);margin-left:4px;letter-spacing:0}
+.kpi .s{font-size:11.5px;color:var(--ink3)}
+.kpi.main{background:var(--brand);border-color:var(--brand);color:#fff}
+.kpi.main .t,.kpi.main .s,.kpi.main .v small{color:rgba(255,255,255,.82)}
+.tag{display:inline-block;font-size:10.5px;padding:1px 6px;border-radius:4px;background:rgba(255,255,255,.2);margin-left:6px;font-weight:700}
+.tag.g{background:var(--brand-soft);color:var(--brand)}
+.calc{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;font-size:12px;color:var(--ink3);margin:14px 2px 18px}
+.calc b{color:var(--ink2)}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:12px;margin-bottom:18px;overflow:hidden}
+.ph{display:flex;justify-content:space-between;align-items:flex-end;gap:10px;flex-wrap:wrap;padding:20px 22px 14px}
+.eyebrow{font-size:10.5px;letter-spacing:1.5px;color:var(--ink3);font-weight:600}
+.ph h2{font-size:18px;margin:4px 0 2px}
+.ph p{margin:0;font-size:12px;color:var(--ink3)}
+.legend{font-size:11.5px;color:var(--ink2)}
+.legend i{display:inline-block;width:8px;height:8px;border-radius:2px;background:var(--brand);margin-right:5px}
+.tw{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums;min-width:640px}
+th{font-size:11.5px;font-weight:600;color:var(--ink3);text-align:right;padding:10px 16px;border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:#fafbfa;white-space:nowrap}
+th:first-child,td:first-child{text-align:left;padding-left:22px}
+td{text-align:right;padding:9px 16px;border-bottom:1px solid var(--line2);white-space:nowrap}
+tr.cur td{background:var(--brand-soft);font-weight:700}
+tr.cur td:first-child{box-shadow:inset 3px 0 0 var(--brand)}
+tr.click{cursor:pointer}
+tr.click:hover td{background:#f6faf8}
+td.eff{color:var(--brand);font-weight:700}
+.barcell{display:flex;align-items:center;gap:12px;justify-content:flex-end}
+.bar{width:90px;height:5px;background:#edf0ee;border-radius:3px;overflow:hidden;flex:none}
+.bar i{display:block;height:100%;background:var(--brand-bar);border-radius:3px}
+tr.cur .bar i{background:var(--brand)}
+.up{color:var(--up)} .down{color:var(--down)} .na{color:var(--ink3)}
+.foot{font-size:11.5px;color:var(--ink3);padding:12px 22px 16px}
+.chart{padding:6px 18px 18px}
+.chart svg{width:100%;height:auto;display:block}
+.chart text{font-family:inherit}
+.empty{padding:60px 20px;text-align:center;color:var(--ink3)}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#1d2421;color:#fff;padding:10px 18px;border-radius:9px;font-size:13px;opacity:0;transition:opacity .2s;pointer-events:none}
+.toast.on{opacity:1}
+.mini{font-size:10.5px;padding:1px 5px;border-radius:4px;background:var(--brand);color:#fff;margin-left:6px;vertical-align:1px}
+@media (max-width:860px){.kpis{grid-template-columns:repeat(2,1fr)} h1{font-size:23px}.kpi .v{font-size:26px}}
+@media (max-width:480px){.kpis{grid-template-columns:1fr}.tabs button{padding:8px 13px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <nav class="tabs" id="tabs"></nav>
+  <div class="crumb">지역별 주택 공급 지표 &nbsp;/&nbsp; <b id="crumbRange">—</b></div>
+  <div class="head">
+    <div>
+      <h1 id="title">—</h1>
+      <p class="sub" id="subtitle">작은 주택은 제외하고, 지역별 주택 공급의 흐름을 살펴보세요.</p>
+    </div>
+    <button class="btn pri" id="refresh" title="저장소의 최신 데이터를 다시 불러옵니다">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M21 12a9 9 0 1 1-2.6-6.4"/><path d="M21 3v6h-6"/></svg>최신 업데이트</button>
+  </div>
+  <div class="status">
+    <div><span class="dot"></span><span id="stLatest">—</span> &nbsp;·&nbsp; 마지막 확인 <span id="stChecked">—</span></div>
+    <div id="stMode">—</div>
+  </div>
+  <div id="notes"></div>
+
+  <div class="filters">
+    <div class="lab">조회 조건 &nbsp;›</div>
+    <label class="fld"><span>기준 연도</span><select id="fYear"></select></label>
+    <label class="fld"><span id="fMonthLab">누계 기준 월</span><select id="fMonth"></select></label>
+    <label class="fld"><span>지역</span><select id="fRegion"></select></label>
+    <button class="btn" id="csv"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>CSV 다운로드</button>
+  </div>
+
+  <div id="app"><div class="empty">데이터를 불러오는 중…</div></div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const TABS = [
+  {k:'permit',   n:'인허가'},
+  {k:'sale',     n:'분양'},
+  {k:'complete', n:'준공'},
+  {k:'start',    n:'착공'},
+  {k:'unsold',   n:'미분양'},
+];
+const REGION_ORDER = ['전국','수도권','지방','서울','인천','경기','부산','대구','광주','대전','울산','세종','강원','충북','충남','전북','전남','전남광주','경북','경남','제주'];
+const S = {tab:'permit', year:null, month:null, region:'전국', data:null};
+const $ = id => document.getElementById(id);
+const fmt = v => v==null||isNaN(v) ? '—' : Math.round(v).toLocaleString('ko-KR');
+const pct = (a,b) => (a==null||b==null||!b) ? null : (a/b-1)*100;
+const pctTxt = p => p==null ? '<span class="na">—</span>' : `<span class="${p>0?'up':p<0?'down':''}">${p>0?'+':''}${p.toFixed(1)}%</span>`;
+
+function readHash(){
+  const h = new URLSearchParams(location.hash.slice(1));
+  if (h.get('t') && TABS.some(t=>t.k===h.get('t'))) S.tab = h.get('t');
+  if (h.get('r')) S.region = h.get('r');
+  if (h.get('y')) S.year = +h.get('y');
+  if (h.get('m')) S.month = +h.get('m');
+}
+function writeHash(){ history.replaceState(null,'',`#t=${S.tab}&r=${encodeURIComponent(S.region)}&y=${S.year}&m=${S.month}`); }
+
+async function load(force){
+  const r = await fetch('data/housing.json' + (force ? '?v='+Date.now() : ''), {cache: force?'no-store':'default'});
+  if (!r.ok) throw new Error('데이터 파일 없음');
+  return r.json();
+}
+
+/* ---------- 데이터 접근 ---------- */
+function ind(k){ return S.data.indicators[k]; }
+function idx(I, y, m){ return I.months.indexOf(`${y}${String(m).padStart(2,'0')}`); }
+function val(I, series, region, y, m){
+  const i = idx(I,y,m); if (i<0) return null;
+  const a = I[series] && I[series][region]; return a ? a[i] : null;
+}
+// 흐름지표: 1~M월 누계. 하나라도 빠지면 null
+function ytd(I, series, region, y, M){
+  let s = 0;
+  for (let m=1;m<=M;m++){ const v = val(I,series,region,y,m); if (v==null) return null; s+=v; }
+  return s;
+}
+function effRegions(I){
+  const all = I.regions;
+  return REGION_ORDER.filter(r=>all.includes(r));
+}
+function latestYM(I){
+  // 전국 total 값이 있는 마지막 달
+  const a = I.total['전국'] || Object.values(I.total)[0];
+  for (let i=I.months.length-1;i>=0;i--) if (a[i]!=null) return [+I.months[i].slice(0,4), +I.months[i].slice(4)];
+  return null;
+}
+
+/* ---------- 렌더 ---------- */
+function renderTabs(){
+  $('tabs').innerHTML = TABS.map(t=>`<button class="${t.k===S.tab?'on':''}" data-k="${t.k}">${t.n}</button>`).join('');
+  $('tabs').querySelectorAll('button').forEach(b=>b.onclick=()=>{S.tab=b.dataset.k; S.year=null; S.month=null; render();});
+}
+
+function setupFilters(I, stock){
+  const [ly, lm] = latestYM(I);
+  const first = +I.months[0].slice(0,4);
+  if (!S.year || S.year>ly || S.year<first) S.year = ly;
+  const maxM = S.year===ly ? lm : 12;
+  if (!S.month || S.month>maxM) S.month = maxM;
+  const regs = effRegions(I);
+  if (!regs.includes(S.region)) S.region = regs.includes('전국') ? '전국' : regs[0];
+  let yo=''; for (let y=ly;y>=first;y--) yo+=`<option value="${y}" ${y===S.year?'selected':''}>${y}년</option>`;
+  $('fYear').innerHTML = yo;
+  let mo=''; for (let m=1;m<=maxM;m++) mo+=`<option value="${m}" ${m===S.month?'selected':''}>${stock? m+'월말' : '1 ~ '+m+'월 누계'}</option>`;
+  $('fMonth').innerHTML = mo;
+  $('fMonthLab').textContent = stock ? '기준 월' : '누계 기준 월';
+  $('fRegion').innerHTML = regs.map(r=>`<option ${r===S.region?'selected':''}>${r}</option>`).join('');
+  $('crumbRange').textContent = `${first} — 현재`;
+  return [ly, lm];
+}
+
+function render(){
+  renderTabs();
+  const tab = TABS.find(t=>t.k===S.tab);
+  const I = ind(S.tab);
+  if (!I || !I.months.length){ $('app').innerHTML = `<div class="empty">${tab.n} 데이터가 아직 없습니다.</div>`; return; }
+  const stock = !!I.stock, hasS = !!I.small;
+  const [ly, lm] = setupFilters(I, stock);
+  writeHash();
+  const sf = I.smallFrom ? `${I.smallFrom.slice(0,4)}년 ${+I.smallFrom.slice(4)}월` : null;
+  if (stock){
+    $('title').textContent = '40㎡ 초과 미분양 주택';
+    $('subtitle').textContent = '미분양은 누계가 아닌 월말 재고입니다. 작은 주택을 제외한 미분양 흐름을 살펴보세요.';
+  } else if (!hasS){
+    $('title').textContent = `주택 ${tab.n} (공동주택)`;
+    $('subtitle').textContent = '분양 실적은 국토부가 주택 규모별로 나누어 발표하지 않아 전체 물량으로 보여드립니다.';
+  } else {
+    $('title').textContent = `40㎡ 초과 주택 ${tab.n}`;
+    $('subtitle').textContent = '작은 주택은 제외하고, 지역별 주택 공급의 흐름을 살펴보세요.';
+  }
+  $('stLatest').innerHTML = `${tab.n} 최신 공표 <b>${ly}년 ${lm}월</b>`;
+  $('stChecked').textContent = S.data.checked || S.data.updated || '—';
+  $('stMode').textContent = stock ? `월말 재고 기준 · 단위: 호` : `매년 1월부터 해당 월까지 누계 · 단위: 호`;
+
+  const notes = [];
+  if (S.data.updated) notes.push(`데이터는 매일 국가통계포털(KOSIS)에서 자동으로 확인합니다. 마지막으로 새 공표분이 반영된 시각: ${S.data.updated}`);
+  if (I.regions.includes('전남광주'))
+    notes.push(`광주·전남이 통합 발표된 달부터는 '전남광주' 항목으로 제공됩니다. 그 전 기간은 광주+전남을 합산해 이어 붙였고, 통합 이후 개별 지역 값이 없으면 '—'로 표시합니다.`);
+  if (stock && sf) notes.push(`미분양의 40㎡ 이하 구분은 ${sf}부터 공표됩니다. 그 이전 달은 40㎡ 초과 값을 '—'로 두고 전체 미분양만 보여드립니다.`);
+  if (S.tab==='sale') notes.push('분양은 국토교통부 「주택건설 분양실적(공동주택)」의 월별 순계(분양+임대+조합 합계) 기준이며, 2013년부터 제공됩니다.');
+  $('notes').innerHTML = notes.map(n=>`<div class="note">${n}</div>`).join('');
+
+  stock ? renderStock(I) : renderFlow(I, tab, hasS);
+}
+
+const AGG = ['전국','수도권','지방'];
+const kpiPct = p => p==null ? '—' : `<span class="${p>0?'up':'down'}">${p>0?'+':''}${p.toFixed(1)}</span>`;
+
+function renderFlow(I, tab, hasS){
+  const {year:Y, month:M, region:R} = S;
+  const small = '40㎡ 이하', effLbl = hasS ? '40㎡ 초과' : '전체';
+  const get = (r,y) => {
+    const t = ytd(I,'total',r,y,M); if (t==null) return null;
+    const s = hasS ? ytd(I,'small',r,y,M) : null;
+    return {t, s, e: hasS ? (s==null?null:t-s) : t};
+  };
+  const cur = get(R,Y) || {}, prv = get(R,Y-1) || {};
+  const yoy = pct(cur.e, prv.e);
+  const first = +I.months[0].slice(0,4);
+
+  const rows = [];
+  for (let y=Y; y>=first; y--){ const g=get(R,y); if(!g) continue; const p=get(R,y-1); rows.push({y,...g,ch:pct(g.e,p&&p.e)}); }
+  const maxE = Math.max(...rows.map(r=>r.e||0), 1);
+  const rrows = effRegions(I).map(r=>{ const g=get(r,Y)||{}, p=get(r,Y-1)||{}; return {r,...g,ch:pct(g.e,p.e)}; });
+  const maxR = Math.max(...rrows.filter(x=>!AGG.includes(x.r)).map(x=>x.e||0), 1);
+
+  const cum=[], cumPrev=[]; let a=0,b=0,okA=true,okB=true;
+  for (let m=1;m<=12;m++){
+    const t=val(I,'total',R,Y,m), s=hasS?val(I,'small',R,Y,m):0;
+    if (m<=M && okA && t!=null && s!=null){ a+=t-s; cum.push(a);} else okA=false;
+    const tp=val(I,'total',R,Y-1,m), sp=hasS?val(I,'small',R,Y-1,m):0;
+    if (okB && tp!=null && sp!=null){ b+=tp-sp; cumPrev.push(b);} else okB=false;
+  }
+
+  const kpis = hasS ? `
+    <div class="kpi main"><div class="t">${R} · ${effLbl} ${tab.n}<span class="tag">핵심</span></div>
+      <div class="v">${fmt(cur.e)}<small>호</small></div><div class="s">${Y}년 ${M}월 기준 · 연중 누계</div></div>
+    <div class="kpi"><div class="t">전체 ${tab.n} 누계</div><div class="v">${fmt(cur.t)}<small>호</small></div><div class="s">모든 주택 규모 합계</div></div>
+    <div class="kpi"><div class="t">제외한 ${small}</div><div class="v">${fmt(cur.s)}<small>호</small></div><div class="s">전용 ${small} · 전체의 ${cur.t?(cur.s/cur.t*100).toFixed(1)+'%':'—'}</div></div>`
+  : `
+    <div class="kpi main"><div class="t">${R} · ${tab.n} 누계<span class="tag">핵심</span></div>
+      <div class="v">${fmt(cur.t)}<small>호</small></div><div class="s">${Y}년 ${M}월 기준 · 연중 누계</div></div>
+    <div class="kpi"><div class="t">${Y-1}년 같은 기간</div><div class="v">${fmt(prv.t)}<small>호</small></div><div class="s">${Y-1}년 1~${M}월 누계</div></div>
+    <div class="kpi"><div class="t">${M}월 한 달</div><div class="v">${fmt(val(I,'total',R,Y,M))}<small>호</small></div><div class="s">${Y}년 ${M}월 월간 실적</div></div>`;
+
+  const th = hasS ? `<th>전체 ${tab.n}</th><th>${small} (제외)</th><th>${effLbl} ${tab.n}</th>` : `<th>${tab.n} 누계</th>`;
+  const tdFlow = (x, bar) => (hasS ? `<td>${fmt(x.t)}</td><td>${fmt(x.s)}</td>` : '') +
+    `<td class="eff"><div class="barcell">${bar}${fmt(x.e)}</div></td>`;
+  const barH = (v,mx) => `<span class="bar"><i style="width:${Math.max(0,(v||0)/mx*100).toFixed(1)}%"></i></span>`;
+
+  $('app').innerHTML = `
+  <div class="kpis">${kpis}
+    <div class="kpi"><div class="t">전년 같은 기간 대비</div><div class="v">${kpiPct(yoy)}<small>%</small></div><div class="s">${Y-1}년 1~${M}월 대비 · ${effLbl}</div></div>
+  </div>
+  <div class="calc"><div>ⓘ <b>계산 기준</b> &nbsp;${hasS ? `전체 ${tab.n} 누계 − ${small} 누계 = ${effLbl} ${tab.n} 누계` : `${tab.n} 실적 1월~해당 월 누계 (규모 구분 미제공)`}</div><div>누계는 매년 1월에 다시 시작합니다.</div></div>
+
+  <section class="panel">
+    <div class="ph"><div><div class="eyebrow">SAME MONTH · YEAR BY YEAR</div><h2>${R} · 과거 같은 달 비교</h2><p>매년 1~${M}월 누계를 최신 연도부터 비교합니다. 행을 누르면 그 연도로 이동합니다.</p></div>
+      <div class="legend"><i></i>${effLbl} ${tab.n} · 단위: 호</div></div>
+    <div class="tw"><table><thead><tr><th>기준 월</th>${th}<th>전년 같은 기간 대비</th></tr></thead><tbody>
+    ${rows.map(r=>`<tr class="click ${r.y===Y?'cur':''}" data-y="${r.y}"><td>${r.y}년 ${M}월${r.y===Y?'<span class="mini">선택</span>':''}</td>${tdFlow(r, barH(r.e,maxE))}<td>${pctTxt(r.ch)}</td></tr>`).join('')}
+    </tbody></table></div>
+    <div class="foot">선택한 연도는 강조됩니다. 증감률은 ${effLbl} 기준입니다. '—'는 비교 기간 자료가 없는 경우입니다.</div>
+  </section>
+
+  <section class="panel">
+    <div class="ph"><div><div class="eyebrow">MONTHLY TREND</div><h2>${R} 월별 누계 추이</h2><p>${Y}년 ${effLbl} ${tab.n}의 1월부터의 누계. 점선은 ${Y-1}년.</p></div>
+      <div class="legend"><i></i>${Y}년 · <span style="color:var(--ink3)">┄ ${Y-1}년</span></div></div>
+    <div class="chart">${chart(cum, cumPrev)}</div>
+  </section>
+
+  <section class="panel">
+    <div class="ph"><div><div class="eyebrow">BY REGION</div><h2>지역별 비교 · ${Y}년 1~${M}월 누계</h2><p>행을 누르면 그 지역으로 바뀝니다.</p></div>
+      <div class="legend"><i></i>${effLbl} ${tab.n} · 단위: 호</div></div>
+    <div class="tw"><table><thead><tr><th>지역</th>${th}${hasS?`<th>${small} 비중</th>`:''}<th>전년 같은 기간 대비</th></tr></thead><tbody>
+    ${rrows.map(x=>`<tr class="click ${x.r===R?'cur':''}" data-r="${x.r}"><td>${x.r}</td>${tdFlow(x, AGG.includes(x.r)?'':barH(x.e,maxR))}${hasS?`<td>${x.t&&x.s!=null?(x.s/x.t*100).toFixed(1)+'%':'—'}</td>`:''}<td>${pctTxt(x.ch)}</td></tr>`).join('')}
+    </tbody></table></div>
+  </section>`;
+  bindRows();
+}
+
+function renderStock(I){
+  const {year:Y, month:M, region:R} = S;
+  const A = ind('unsold_after');
+  const at = (X,r,y,m) => { if(!X) return {}; const t=val(X,'total',r,y,m); if(t==null) return {}; const s=val(X,'small',r,y,m); return {t,s,e:s==null?null:t-s}; };
+  const c = at(I,R,Y,M), p = at(I,R,Y-1,M), af = at(A,R,Y,M);
+  const yoyE = pct(c.e,p.e), yoyT = pct(c.t,p.t);
+  const first = +I.months[0].slice(0,4);
+  const rows=[];
+  for (let y=Y;y>=first;y--){ const g=at(I,R,y,M); if(g.t==null) continue; const q=at(I,R,y-1,M); rows.push({y,...g,af:at(A,R,y,M),ch:pct(g.e,q.e),chT:pct(g.t,q.t)}); }
+  const maxE = Math.max(...rows.map(r=>r.e??r.t??0),1);
+  const rrows = effRegions(I).map(r=>{ const g=at(I,r,Y,M), q=at(I,r,Y-1,M); return {r,...g,af:at(A,r,Y,M),ch:pct(g.e,q.e)}; });
+  const maxR = Math.max(...rrows.filter(x=>!AGG.includes(x.r)).map(x=>x.e||0),1);
+  const series=[], labels=[];
+  for (let k=23;k>=0;k--){ let y=Y, m=M-k; while(m<1){m+=12;y--;} const g=at(I,R,y,m); if(g.t!=null){series.push(g.e??g.t);labels.push(`${String(y).slice(2)}.${m}`);} }
+  const barH = (v,mx) => `<span class="bar"><i style="width:${Math.max(0,(v||0)/mx*100).toFixed(1)}%"></i></span>`;
+
+  $('app').innerHTML = `
+  <div class="kpis">
+    <div class="kpi main"><div class="t">${R} · 40㎡ 초과 미분양<span class="tag">핵심</span></div><div class="v">${fmt(c.e)}<small>호</small></div><div class="s">${Y}년 ${M}월말 기준</div></div>
+    <div class="kpi"><div class="t">전체 미분양</div><div class="v">${fmt(c.t)}<small>호</small></div><div class="s">제외한 40㎡ 이하 ${fmt(c.s)}호 · 전년 동월 대비 ${yoyT==null?'—':(yoyT>0?'+':'')+yoyT.toFixed(1)+'%'}</div></div>
+    <div class="kpi"><div class="t">준공 후 미분양 (40㎡ 초과)</div><div class="v">${fmt(af.e)}<small>호</small></div><div class="s">전체 준공 후 미분양 ${fmt(af.t)}호</div></div>
+    <div class="kpi"><div class="t">전년 같은 달 대비</div><div class="v">${kpiPct(yoyE)}<small>%</small></div><div class="s">${Y-1}년 ${M}월말 대비 · 40㎡ 초과</div></div>
+  </div>
+  <div class="calc"><div>ⓘ <b>계산 기준</b> &nbsp;전체 미분양 − 40㎡ 이하 미분양 = 40㎡ 초과 미분양 (월말 재고)</div><div>40㎡ 구분이 없는 달은 '—'로 표시합니다.</div></div>
+  <section class="panel">
+    <div class="ph"><div><div class="eyebrow">SAME MONTH · YEAR BY YEAR</div><h2>${R} · 과거 같은 달 비교</h2><p>매년 ${M}월말 미분양을 비교합니다. 행을 누르면 그 연도로 이동합니다.</p></div><div class="legend"><i></i>40㎡ 초과 미분양 · 단위: 호</div></div>
+    <div class="tw"><table><thead><tr><th>기준 월</th><th>전체 미분양</th><th>40㎡ 이하 (제외)</th><th>40㎡ 초과 미분양</th><th>준공 후 (40㎡ 초과)</th><th>전년 같은 달 대비</th></tr></thead><tbody>
+    ${rows.map(r=>`<tr class="click ${r.y===Y?'cur':''}" data-y="${r.y}"><td>${r.y}년 ${M}월말${r.y===Y?'<span class="mini">선택</span>':''}</td>
+      <td>${fmt(r.t)}</td><td>${fmt(r.s)}</td><td class="eff"><div class="barcell">${r.e==null?'':barH(r.e,maxE)}${fmt(r.e)}</div></td><td>${fmt(r.af.e)}</td><td>${r.e==null?`<span class="na" title="전체 기준">${r.chT==null?'—':'(전체 '+(r.chT>0?'+':'')+r.chT.toFixed(1)+'%)'}</span>`:pctTxt(r.ch)}</td></tr>`).join('')}
+    </tbody></table></div>
+    <div class="foot">40㎡ 구분 공표 전 연도는 괄호 안에 전체 미분양 기준 증감률을 회색으로 표시합니다.</div>
+  </section>
+  <section class="panel">
+    <div class="ph"><div><div class="eyebrow">MONTHLY TREND</div><h2>${R} 미분양 최근 24개월</h2><p>월말 40㎡ 초과 미분양(구분 공표 전은 전체).</p></div></div>
+    <div class="chart">${chart(series, null, labels)}</div>
+  </section>
+  <section class="panel">
+    <div class="ph"><div><div class="eyebrow">BY REGION</div><h2>지역별 비교 · ${Y}년 ${M}월말</h2><p>행을 누르면 그 지역으로 바뀝니다.</p></div><div class="legend"><i></i>40㎡ 초과 미분양 · 단위: 호</div></div>
+    <div class="tw"><table><thead><tr><th>지역</th><th>전체 미분양</th><th>40㎡ 이하 (제외)</th><th>40㎡ 초과 미분양</th><th>준공 후 (40㎡ 초과)</th><th>전년 같은 달 대비</th></tr></thead><tbody>
+    ${rrows.map(x=>`<tr class="click ${x.r===R?'cur':''}" data-r="${x.r}"><td>${x.r}</td><td>${fmt(x.t)}</td><td>${fmt(x.s)}</td>
+      <td class="eff"><div class="barcell">${AGG.includes(x.r)||x.e==null?'':barH(x.e,maxR)}${fmt(x.e)}</div></td><td>${fmt(x.af.e)}</td><td>${pctTxt(x.ch)}</td></tr>`).join('')}
+    </tbody></table></div>
+  </section>`;
+  bindRows();
+}
+
+function bindRows(){
+  document.querySelectorAll('tr[data-y]').forEach(tr=>tr.onclick=()=>{S.year=+tr.dataset.y; render(); window.scrollTo({top:0,behavior:'smooth'});});
+  document.querySelectorAll('tr[data-r]').forEach(tr=>tr.onclick=()=>{S.region=tr.dataset.r; render(); window.scrollTo({top:0,behavior:'smooth'});});
+}
+
+function chart(vals, prev, labels){
+  if (!vals.length) return '<div class="empty">자료 없음</div>';
+  const n = labels ? vals.length : 12;
+  const W=1000,H=300,pl=10,pr=10,pt=28,pb=30, cw=(W-pl-pr)/n, bw=Math.min(cw*0.58,56);
+  const mx = Math.max(...vals, ...(prev||[]), 1)*1.08;
+  const y = v => pt+(H-pt-pb)*(1-v/mx);
+  let s = `<svg viewBox="0 0 ${W} ${H}" role="img">`;
+  for (let g=1; g<=3; g++){ const gy = pt+(H-pt-pb)*g/4; s+=`<line x1="${pl}" x2="${W-pr}" y1="${gy}" y2="${gy}" stroke="#eef0ef"/>`; }
+  vals.forEach((v,i)=>{
+    const x = pl+cw*i+(cw-bw)/2, last = i===vals.length-1;
+    s+=`<rect x="${x}" y="${y(v)}" width="${bw}" height="${H-pb-y(v)}" rx="3" fill="${last?'#16785a':'#cfe3da'}"><title>${fmt(v)}호</title></rect>`;
+    if (!labels || last || i%3===0) s+=`<text x="${x+bw/2}" y="${y(v)-7}" text-anchor="middle" font-size="12" fill="${last?'#16785a':'#8b948f'}" font-weight="${last?700:500}">${fmt(v)}</text>`;
+  });
+  if (prev && prev.length){
+    const pts = prev.map((v,i)=>`${pl+cw*i+cw/2},${y(v)}`).join(' ');
+    s+=`<polyline points="${pts}" fill="none" stroke="#b9c0bc" stroke-width="2" stroke-dasharray="5 4"/>`;
+  }
+  for (let i=0;i<n;i++) s+=`<text x="${pl+cw*i+cw/2}" y="${H-9}" text-anchor="middle" font-size="12" fill="#8b948f">${labels?labels[i]:(i+1)+'월'}</text>`;
+  return s+'</svg>';
+}
+
+/* ---------- CSV ---------- */
+function downloadCSV(){
+  const I = ind(S.tab), tab = TABS.find(t=>t.k===S.tab);
+  const A = I.stock ? ind('unsold_after') : null, hasS = !!I.small;
+  const head = ['기준월','지역', I.stock?'전체 미분양':`전체 ${tab.n}(월)`];
+  if (hasS) head.push('40㎡ 이하(제외)', I.stock?'40㎡ 초과 미분양':`40㎡ 초과 ${tab.n}(월)`);
+  if (A) head.push('준공후 미분양 전체','준공후 미분양 40㎡ 초과');
+  const lines = [head.join(',')];
+  I.months.forEach((mo,i)=>{
+    effRegions(I).forEach(r=>{
+      const t=I.total[r]?.[i]; if (t==null) return;
+      const row=[mo,r,t];
+      if (hasS){ const s=I.small[r]?.[i]; row.push(s??'', s==null?'':t-s); }
+      if (A){ const ai=A.months.indexOf(mo), at=ai>=0?A.total[r]?.[ai]:null, as=ai>=0?A.small[r]?.[ai]:null; row.push(at??'', at==null||as==null?'':at-as); }
+      lines.push(row.join(','));
+    });
+  });
+  const blob = new Blob(['\ufeff'+lines.join('\n')], {type:'text/csv;charset=utf-8'});
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+  a.download = `주택공급_${tab.n}_월별_지역별.csv`; a.click(); setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+}
+
+function toast(msg){ const t=$('toast'); t.textContent=msg; t.classList.add('on'); setTimeout(()=>t.classList.remove('on'),2400); }
+
+$('fYear').onchange = e=>{S.year=+e.target.value; S.month=null; render();};
+$('fMonth').onchange = e=>{S.month=+e.target.value; render();};
+$('fRegion').onchange = e=>{S.region=e.target.value; render();};
+$('csv').onclick = downloadCSV;
+$('refresh').onclick = async ()=>{
+  try{ const before = S.data.updated; S.data = await load(true); render();
+    toast(S.data.updated===before ? '이미 최신 상태입니다. 새로 공표된 자료가 없습니다.' : '최신 자료로 갱신했습니다.'); }
+  catch(e){ toast('불러오기 실패: '+e.message); }
+};
+
+readHash();
+load(false).then(d=>{S.data=d; render();}).catch(e=>{
+  $('app').innerHTML = `<div class="empty">데이터를 불러오지 못했습니다 (${e.message}).<br>data/housing.json 이 아직 생성되지 않았을 수 있습니다.</div>`;
+  renderTabs();
+});
+</script>
+</body>
+</html>
